@@ -13,7 +13,7 @@
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #f5f5f5;
+            background: #f8f6fa;
             padding: 20px;
             color: #333;
         }
@@ -34,7 +34,7 @@
         .header h1 {
             font-size: 2.5em;
             margin-bottom: 10px;
-            color: #2c3e50;
+            color: #6b5b95;
         }
         
         .stats {
@@ -55,13 +55,54 @@
         .stat-number {
             font-size: 2.5em;
             font-weight: bold;
-            color: #3498db;
+            color: #9d89c7;
             margin-bottom: 10px;
         }
         
         .stat-label {
             color: #7f8c8d;
             font-size: 1.1em;
+        }
+        
+        .jira-config {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        .jira-config h3 {
+            color: #6b5b95;
+            margin-bottom: 15px;
+        }
+        
+        .jira-status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 500;
+            margin-left: 10px;
+        }
+        
+        .jira-connected { background: #e6f3e6; color: #27ae60; }
+        .jira-disconnected { background: #ffe6e6; color: #e74c3c; }
+        
+        .config-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr auto;
+            gap: 15px;
+            align-items: end;
+        }
+        
+        .sync-results {
+            background: #f4f2f7;
+            border: 1px solid #c8b9db;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: none;
         }
         
         .controls {
@@ -86,7 +127,7 @@
         }
         
         .btn {
-            background: #3498db;
+            background: #9d89c7;
             color: white;
             border: none;
             padding: 12px 24px;
@@ -98,11 +139,11 @@
         }
         
         .btn:hover {
-            background: #2980b9;
+            background: #8b7bb8;
         }
         
-        .btn-success { background: #27ae60; }
-        .btn-success:hover { background: #229954; }
+        .btn-success { background: #a89cc8; }
+        .btn-success:hover { background: #9b8dc2; }
         
         .projects {
             display: grid;
@@ -132,7 +173,7 @@
         .project-title {
             font-size: 1.4em;
             font-weight: 600;
-            color: #2c3e50;
+            color: #6b5b95;
             margin-bottom: 8px;
         }
         
@@ -145,12 +186,12 @@
             margin-right: 8px;
         }
         
-        .status-planning { background: #ecf0f1; color: #34495e; }
-        .status-progress { background: #d5e8ff; color: #2980b9; }
-        .status-completed { background: #d5f5d5; color: #27ae60; }
+        .status-planning { background: #f4f2f7; color: #6b5b95; }
+        .status-progress { background: #e8e3f0; color: #7c6ba0; }
+        .status-completed { background: #e6f3e6; color: #27ae60; }
         .status-risk { background: #ffeaa7; color: #e17055; }
-        .status-idea { background: #fef9e7; color: #b7791f; }
-        .status-ongoing { background: #e8f5e8; color: #2d8659; }
+        .status-idea { background: #f9f7fb; color: #8b7bb8; }
+        .status-ongoing { background: #f0eef5; color: #7c6ba0; }
         
         .priority {
             font-weight: 600;
@@ -178,7 +219,7 @@
         
         .progress-fill {
             height: 100%;
-            background: #3498db;
+            background: #9d89c7;
             border-radius: 4px;
             transition: width 0.3s;
         }
@@ -226,7 +267,7 @@
             display: block;
             margin-bottom: 5px;
             font-weight: 500;
-            color: #2c3e50;
+            color: #6b5b95;
         }
         
         .form-group input,
@@ -251,20 +292,20 @@
         }
         
         .jira-notice {
-            background: #e3f2fd;
-            border: 1px solid #90caf9;
+            background: #f4f2f7;
+            border: 1px solid #c8b9db;
             padding: 20px;
             border-radius: 12px;
             margin-top: 30px;
         }
         
         .jira-notice h4 {
-            color: #1565c0;
+            color: #6b5b95;
             margin-bottom: 10px;
         }
         
         .jira-notice p {
-            color: #1976d2;
+            color: #7c6ba0;
             font-size: 0.95em;
         }
     </style>
@@ -296,11 +337,36 @@
             </div>
         </div>
         
+        <!-- Jira Configuration -->
+        <div class="jira-config">
+            <h3>🔗 Jira Integration <span class="jira-status jira-disconnected" id="jira-status">Disconnected</span></h3>
+            <div class="config-row">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>Jira Base URL</label>
+                    <input type="url" id="jira-url" placeholder="https://yourcompany.atlassian.net" style="width: 100%; padding: 10px; border: 1px solid #bdc3c7; border-radius: 6px;">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>Email</label>
+                    <input type="email" id="jira-email" placeholder="your-email@company.com" style="width: 100%; padding: 10px; border: 1px solid #bdc3c7; border-radius: 6px;">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>API Token</label>
+                    <input type="password" id="jira-token" placeholder="Your API token" style="width: 100%; padding: 10px; border: 1px solid #bdc3c7; border-radius: 6px;">
+                </div>
+                <div>
+                    <button class="btn" onclick="testJiraConnection()" style="margin-right: 5px;">Test Connection</button>
+                    <button class="btn btn-success" onclick="syncWithJira()">Sync Projects</button>
+                </div>
+            </div>
+            <div class="sync-results" id="sync-results"></div>
+        </div>
+        
         <!-- Controls -->
         <div class="controls">
             <div class="controls-left">
                 <button class="btn" onclick="showAddForm()">➕ Add Project</button>
                 <button class="btn btn-success" onclick="exportData()">📊 Export Data</button>
+                <button class="btn" onclick="importFromJira()" id="import-btn" style="background: #7c6ba0;">📥 Import from Jira</button>
             </div>
             <div class="controls-right">
                 💡 Tip: Click the 🗑️ button on any project card to delete it
@@ -312,10 +378,13 @@
             <!-- Projects will be inserted here -->
         </div>
         
-        <!-- Jira Integration Notice -->
+        <!-- Jira & GitLab Integration Notice -->
         <div class="jira-notice">
-            <h4>🔗 Jira Integration Ready</h4>
-            <p>This dashboard is designed to connect with Jira API. Once you have API access, we can automatically sync project data, progress, and blockers from your Jira instance.</p>
+            <h4>🔗 Integration Guide</h4>
+            <p><strong>Step 1:</strong> Get your Jira API token from <a href="https://id.atlassian.com/manage-profile/security/api-tokens" target="_blank" style="color: #9d89c7;">id.atlassian.com</a></p>
+            <p><strong>Step 2:</strong> Enter your Jira URL, email, and API token above</p>
+            <p><strong>Step 3:</strong> Test connection and sync your epics automatically!</p>
+            <p><strong>GitLab:</strong> Add repository links to projects for easy code access</p>
         </div>
     </div>
     
@@ -389,7 +458,8 @@
                     <input type="text" id="project-jira" placeholder="e.g., PLAT-123">
                 </div>
                 <div class="form-group">
-                    <label></label>
+                    <label>GitLab Repository</label>
+                    <input type="url" id="project-gitlab" placeholder="https://gitlab.com/yourteam/project">
                 </div>
             </div>
             <div class="form-group">
@@ -424,6 +494,7 @@
                 scope: ["Map Agents → Listings", "Show incidents with High Priority", "Show root causes → generate reports without dev effort", "Allow Support team to troubleshoot/fix issues in platform"],
                 blockers: [],
                 jiraEpic: "",
+                gitlabUrl: "",
                 owner: ""
             },
             {
@@ -440,11 +511,34 @@
                 scope: ["Support Subject + Body plain text emails", "Continue SendGrid templates"],
                 blockers: [],
                 jiraEpic: "",
+                gitlabUrl: "",
                 owner: "Samvel Melikjanyan"
             }
         ];
         
         let editingId = null;
+        let jiraConfig = {
+            url: '',
+            email: '',
+            token: '',
+            connected: false
+        };
+
+        // Load Jira config from browser storage if available
+        try {
+            const savedConfig = JSON.parse(sessionStorage.getItem('jiraConfig') || '{}');
+            if (savedConfig.url) {
+                jiraConfig = savedConfig;
+                document.getElementById('jira-url').value = jiraConfig.url;
+                document.getElementById('jira-email').value = jiraConfig.email;
+                document.getElementById('jira-token').value = jiraConfig.token;
+                if (jiraConfig.connected) {
+                    updateJiraStatus(true);
+                }
+            }
+        } catch (e) {
+            console.log('No saved Jira config found');
+        }
 
         function renderProjects() {
             const container = document.getElementById('projects-container');
@@ -485,6 +579,7 @@
                         ${project.owner ? `<div><strong>Owner:</strong> ${project.owner}</div>` : ''}
                         <div><strong>Timeline:</strong> ${new Date(project.startDate).toLocaleDateString()} - ${new Date(project.endDate).toLocaleDateString()}</div>
                         ${project.jiraEpic ? `<div><strong>Epic:</strong> ${project.jiraEpic}</div>` : ''}
+                        ${project.gitlabUrl ? `<div><strong>GitLab:</strong> <a href="${project.gitlabUrl}" target="_blank" style="color: #9d89c7; text-decoration: none;">🔗 View Repository</a></div>` : ''}
                         ${project.description ? `<div><strong>Description:</strong> ${project.description}</div>` : ''}
                         ${project.vision ? `<div><strong>Vision/Goal:</strong> ${project.vision}</div>` : ''}
                         ${project.scope && project.scope.length > 0 ? `<div><strong>Scope:</strong><ul style="margin: 5px 0; padding-left: 20px;">${project.scope.map(item => `<li>${item}</li>`).join('')}</ul></div>` : ''}
@@ -539,6 +634,7 @@
             document.getElementById('project-end').value = project.endDate;
             document.getElementById('project-progress').value = project.progress;
             document.getElementById('project-jira').value = project.jiraEpic;
+            document.getElementById('project-gitlab').value = project.gitlabUrl || '';
             document.getElementById('project-description').value = project.description;
             document.getElementById('project-vision').value = project.vision || '';
             document.getElementById('project-scope').value = project.scope ? project.scope.join('\n') : '';
@@ -587,6 +683,7 @@
                 endDate: document.getElementById('project-end').value,
                 progress: parseInt(document.getElementById('project-progress').value) || 0,
                 jiraEpic: document.getElementById('project-jira').value.trim(),
+                gitlabUrl: document.getElementById('project-gitlab').value.trim(),
                 description: document.getElementById('project-description').value.trim(),
                 vision: document.getElementById('project-vision').value.trim(),
                 scope: document.getElementById('project-scope').value.split('\n').map(s => s.trim()).filter(s => s),
@@ -620,6 +717,7 @@
             document.getElementById('project-end').value = '';
             document.getElementById('project-progress').value = '0';
             document.getElementById('project-jira').value = '';
+            document.getElementById('project-gitlab').value = '';
             document.getElementById('project-description').value = '';
             document.getElementById('project-vision').value = '';
             document.getElementById('project-scope').value = '';
@@ -635,6 +733,172 @@
             linkElement.setAttribute('href', dataUri);
             linkElement.setAttribute('download', exportFileDefaultName);
             linkElement.click();
+        }
+        
+        // Jira Integration Functions
+        function updateJiraStatus(connected) {
+            const statusEl = document.getElementById('jira-status');
+            if (connected) {
+                statusEl.textContent = 'Connected';
+                statusEl.className = 'jira-status jira-connected';
+                jiraConfig.connected = true;
+            } else {
+                statusEl.textContent = 'Disconnected';
+                statusEl.className = 'jira-status jira-disconnected';
+                jiraConfig.connected = false;
+            }
+        }
+        
+        async function testJiraConnection() {
+            const url = document.getElementById('jira-url').value.trim();
+            const email = document.getElementById('jira-email').value.trim();
+            const token = document.getElementById('jira-token').value.trim();
+            
+            if (!url || !email || !token) {
+                alert('Please fill in all Jira connection fields');
+                return;
+            }
+            
+            // Save config
+            jiraConfig = { url, email, token, connected: false };
+            sessionStorage.setItem('jiraConfig', JSON.stringify(jiraConfig));
+            
+            try {
+                const response = await fetch(`${url}/rest/api/3/myself`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Basic ${btoa(email + ':' + token)}`,
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const user = await response.json();
+                    updateJiraStatus(true);
+                    showSyncResults(`✅ Connected successfully! Welcome, ${user.displayName}`, 'success');
+                    sessionStorage.setItem('jiraConfig', JSON.stringify(jiraConfig));
+                } else {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+            } catch (error) {
+                updateJiraStatus(false);
+                showSyncResults(`❌ Connection failed: ${error.message}`, 'error');
+                console.error('Jira connection error:', error);
+            }
+        }
+        
+        async function syncWithJira() {
+            if (!jiraConfig.connected) {
+                alert('Please test the connection first');
+                return;
+            }
+            
+            try {
+                showSyncResults('🔄 Syncing projects from Jira...', 'info');
+                
+                // Fetch epics from Jira
+                const response = await fetch(`${jiraConfig.url}/rest/api/3/search?jql=type=Epic&fields=summary,status,assignee,created,updated,description`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Basic ${btoa(jiraConfig.email + ':' + jiraConfig.token)}`,
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                let syncedCount = 0;
+                
+                data.issues.forEach(epic => {
+                    // Check if project already exists
+                    const existingProject = projects.find(p => p.jiraEpic === epic.key);
+                    
+                    if (!existingProject) {
+                        const newProject = {
+                            id: Date.now() + Math.random(),
+                            name: epic.fields.summary,
+                            status: mapJiraStatus(epic.fields.status.name),
+                            priority: 'Medium',
+                            startDate: epic.fields.created.split('T')[0],
+                            endDate: '',
+                            progress: getProgressFromStatus(epic.fields.status.name),
+                            team: 'Backend Team',
+                            description: epic.fields.description?.content?.[0]?.content?.[0]?.text || 'Imported from Jira',
+                            vision: '',
+                            scope: [],
+                            blockers: [],
+                            jiraEpic: epic.key,
+                            gitlabUrl: '',
+                            owner: epic.fields.assignee?.displayName || ''
+                        };
+                        
+                        projects.push(newProject);
+                        syncedCount++;
+                    }
+                });
+                
+                renderProjects();
+                showSyncResults(`✅ Sync completed! ${syncedCount} new projects imported from Jira`, 'success');
+                
+            } catch (error) {
+                showSyncResults(`❌ Sync failed: ${error.message}`, 'error');
+                console.error('Jira sync error:', error);
+            }
+        }
+        
+        function mapJiraStatus(jiraStatus) {
+            const statusMap = {
+                'To Do': 'Idea',
+                'In Progress': 'In Progress',
+                'Done': 'Completed',
+                'Backlog': 'Planning',
+                'Selected for Development': 'Planning',
+                'In Development': 'In Progress',
+                'In Review': 'In Progress',
+                'Testing': 'In Progress',
+                'Blocked': 'At Risk'
+            };
+            return statusMap[jiraStatus] || 'Planning';
+        }
+        
+        function getProgressFromStatus(status) {
+            const progressMap = {
+                'To Do': 0,
+                'Backlog': 0,
+                'Selected for Development': 10,
+                'In Progress': 50,
+                'In Development': 40,
+                'In Review': 70,
+                'Testing': 80,
+                'Done': 100,
+                'Blocked': 25
+            };
+            return progressMap[status] || 0;
+        }
+        
+        function importFromJira() {
+            if (!jiraConfig.connected) {
+                alert('Please configure and test Jira connection first');
+                return;
+            }
+            syncWithJira();
+        }
+        
+        function showSyncResults(message, type) {
+            const resultsEl = document.getElementById('sync-results');
+            resultsEl.innerHTML = message;
+            resultsEl.style.display = 'block';
+            resultsEl.className = `sync-results ${type}`;
+            
+            if (type === 'success' || type === 'error') {
+                setTimeout(() => {
+                    resultsEl.style.display = 'none';
+                }, 5000);
+            }
         }
         
         // Close modal when clicking outside
